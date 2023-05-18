@@ -21,7 +21,7 @@
                     </span>
                     <span 
                         v-if="stage.thresholdPoints && 
-                        bestScore > stage.thresholdPoints"
+                        bestScore >= stage.thresholdPoints"
                     >
                         / {{ stage.thresholdPoints }}
                     </span>

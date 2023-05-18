@@ -57,7 +57,7 @@
         },
         {
             "name": "Second Game",
-            "bestResult": 0,
+            "bestResult": 100,
             "isPlayed": true
         },
         {
