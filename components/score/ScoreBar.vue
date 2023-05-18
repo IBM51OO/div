@@ -28,7 +28,10 @@
                 </div>
             </div>
         </div>
-        <div class="score-bar__progress" :style="{width: `${bestScore}%`}"></div>
+        <div class="score-bar__progress" 
+            :style="{width: `${bestScore}%`}" 
+            :class="{'score-bar__progress_rounded': bestScore >= stages[stages.length - 1].thresholdPoints}">
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -180,13 +183,17 @@ function delimiterPosition(stageNum: number)
     }
     .score-bar__progress
     {
-        border-radius: 30px;
+        border-radius: 30px 0 0 30px;
         position: absolute;
         height: 40px;
         max-width: 1440px;
         width: 100px;
         transition: 500ms all ease-in-out;
         background: $div-starBlue;
+    }
+    .score-bar__progress_rounded
+    {
+        border-radius: 30px;
     }
 }
 </style>
