@@ -1,5 +1,5 @@
 <template>
-    <div class="score-bar" v-if="bestScore != undefined">
+    <div class="score-bar" v-if="stages.length && bestScore != undefined">
         <div class="score-bar__stages">
             <div class="stage" 
                     v-for="(stage, index) in modifiedStages" 
