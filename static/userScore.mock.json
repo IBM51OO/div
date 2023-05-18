@@ -1,0 +1,92 @@
+[{
+    "name": "1",
+    "id": 1,
+    "thresholdPoints": 25,
+    "games": 
+    [
+        {
+            "name": "First game",
+            "bestResult": 10,
+            "isPlayed": true
+        },
+        {
+            "name": "Second Game",
+            "bestResult": 3,
+            "isPlayed": true
+        },
+        {
+            "name": "Third",
+            "bestResult": 12,
+            "isPlayed": true
+        }
+    ]
+},
+{
+    "id": 2,
+    "name": "2",
+    "thresholdPoints": 50,
+    "games": 
+    [
+        {
+            "name": "First game",
+            "bestResult": 13,
+            "isPlayed": true
+        },
+        {
+            "name": "Second Game",
+            "bestResult": 100,
+            "isPlayed": true
+        },
+        {
+            "name": "Third",
+            "bestResult": 0,
+            "isPlayed": false
+        }
+    ]
+},
+{
+    "id": 3,
+    "name": "3",
+    "thresholdPoints": 75,
+    "games": 
+    [
+        {
+            "name": "First game",
+            "bestResult": 0,
+            "isPlayed": true
+        },
+        {
+            "name": "Second Game",
+            "bestResult": 0,
+            "isPlayed": true
+        },
+        {
+            "name": "Third",
+            "bestResult": 12,
+            "isPlayed": true
+        }
+    ]
+},
+{
+    "id": 4,
+    "name": "4",
+    "thresholdPoints": 100,
+    "games": 
+    [
+        {
+            "name": "First game",
+            "bestResult": 12,
+            "isPlayed": true
+        },
+        {
+            "name": "Second Game",
+            "bestResult": 12,
+            "isPlayed": true
+        },
+        {
+            "name": "Third",
+            "bestResult": 12,
+            "isPlayed": true
+        }
+    ]
+}]
