@@ -25,7 +25,7 @@ export const useUser = defineStore('user', {
         },
         async fetchUserScore()
         {
-            const response = (await api.userRepository.getUserScore()).value as Stage[];
+            const response = (await api.userRepository.getUserScore())?.stages as Stage[];
             this.setUserScore(response)            
         }
     }

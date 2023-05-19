@@ -1,36 +1,33 @@
 <template>
-    <div class="score-bar" v-if="stages.length && bestScore != undefined">
+    <div class="score-bar" v-if="stages.length">
         <div class="score-bar__stages">
             <div class="stage" 
-                    v-for="(stage, index) in modifiedStages" 
+                    v-for="(stage, index) in stages" 
                     :key="stage.id" 
-                    :style="{left: `${delimiterPosition(stage.thresholdPoints)}%`}"
+                    :style="{left: `${delimiterPosition(index)}%`, width:`${1 / stages.length * 100}%`}"
                 >
+                
+                <div class="score-bar__progress" :style="{width: `${progressBarWidth(stage, index)}%`}">
+
+                </div>
                 <div class="stage__delimiter"
                     v-if="stage.thresholdPoints"
-                    :class="{'stage_reached': bestScore >= stage.thresholdPoints}"
+                    :class="{'stage_reached': lastAchivedStagePoints >= stage.thresholdPoints}"
                 >
                     
-                    <AchivementIcon class="achivement" v-if="stages.length === index"/>
+                    <AchivementIcon class="achivement" v-if="stages.length - 1 === index"/>
                     <StarIcon class="star" v-else />
 
                 </div>
                 <div class="stage__threshold-points">
+                    <span v-if="lastAchivedStage && lastAchivedStagePoints === stage.thresholdPoints && lastAchivedStage === index">
+                    {{ scoreDiv(stage) }} /
+                    </span>
                     <span>
                         {{ stage.thresholdPoints }} 
                     </span>
-                    <span 
-                        v-if="stage.thresholdPoints && 
-                        bestScore >= stage.thresholdPoints"
-                    >
-                        / {{ stage.thresholdPoints }}
-                    </span>
                 </div>
             </div>
-        </div>
-        <div class="score-bar__progress" 
-            :style="{width: `${bestScore}%`}" 
-            :class="{'score-bar__progress_rounded': bestScore >= stages[stages.length - 1].thresholdPoints}">
         </div>
     </div>
 </template>
@@ -43,56 +40,70 @@ import { useUser } from "@/store/user/userStore";
 const userStore = useUser();
 await userStore.fetchUserScore();
 
+
 const stages = ref<Stage[]>([]);
-const modifiedStages = ref<Stage[] | undefined>();
-const firstStage = <Stage[]>(
-[{
-    name: 'zeroStage',
-    id: 0,
-    thresholdPoints: 0,
-    games: []
-}])
+
 const userScore = computed(() => userStore.getUserScore)
 
 stages.value = userScore.value as Stage[]
 
-modifiedStages.value = [...firstStage, ...stages.value];
+const lastAchivedStagePoints = ref(0);
+const lastAchivedStage = ref<Number | null>(null);
 
-const bestScore = stagesBestScore(modifiedStages.value)
-
-function stagesBestScore(modifiedStages: Stage[] | undefined)
+function scoreDiv(stage: Stage)
 {
-    if(modifiedStages)
+    const currentScoreResult = currentScore(stage)
+
+    if(currentScoreResult > stage.thresholdPoints)
     {
-        let bestScore = 0;
-        for(let i = 1; i < modifiedStages.length; i++)
-        {
-            let currentThreholdPoints = modifiedStages[i].thresholdPoints;
-            
-            for(let j = 0; j < modifiedStages[i].games.length; j++)
-            {
-                if(modifiedStages[i].games[j].isPlayed)
-                {
-                    bestScore += modifiedStages[i].games[j].bestResult
-                }
-            }
-            
-            if(bestScore >= currentThreholdPoints)
-            {   
-                bestScore = currentThreholdPoints;
-            }
-            else
-            {
-                return bestScore
-            }
-        }
-        return bestScore
+        return stage.thresholdPoints
+    }
+    else
+    {
+        return currentScoreResult
     }
 }
-
-function delimiterPosition(stageNum: number)
+function currentScore(stage: Stage)
 {
-    return ((stageNum / stages.value[stages.value.length - 1].thresholdPoints) * 100)
+    let currentScoreResult = 0;
+    stage.games.forEach(element => 
+    {
+        if(element.isPlayed)
+        {
+            currentScoreResult += element.bestResult
+        }
+    });
+    return currentScoreResult;
+}
+
+function progressBarWidth(stage: Stage, index: number)
+{
+    if(lastAchivedStage.value === null)
+    {
+        const scoreSum = currentScore(stage);
+        
+        if(scoreSum >= stage.thresholdPoints)
+        {
+            if(index === stages.value.length - 1)
+            {
+                lastAchivedStage.value = index
+            }
+            lastAchivedStagePoints.value = stage.thresholdPoints;
+
+            return 100
+        }
+        
+        
+        else if(scoreSum <= stage.thresholdPoints)
+        {
+            lastAchivedStage.value = index
+            return scoreSum / stage.thresholdPoints * 100;
+        }
+    }
+}
+function delimiterPosition(index: number)
+{
+    return ((index / stages.value.length) * 100)
 }
 
 
@@ -110,29 +121,11 @@ function delimiterPosition(stageNum: number)
     .stage
     {
         font-family: 'Inter';
-        &:first-child
-        {
-            .stage__threshold-points
-            {
-               left: 10px;
-            }
-        }
-        &:last-child
-        {
-            .stage__threshold-points
-            {
-                // position: absolute;
-               right: 10px;
-            }
-            .stage__delimiter
-            {
-                background: none;
-            }
-        }
+        
         height: 100%;
         display: flex;
         align-items: flex-end;
-        justify-content: center;
+        justify-content: right;
         position: absolute;
         .score-bar__delimiter
         {
@@ -149,6 +142,7 @@ function delimiterPosition(stageNum: number)
             color: rgba($color: #000000, $alpha: 0.5);
             position: absolute;
             bottom: -30px;
+            transform: translate(50%, 0);
         }
         .stage__delimiter
         {
@@ -179,21 +173,53 @@ function delimiterPosition(stageNum: number)
                 fill: $div-starBlue;
             }
         }
+        &:first-child
+        {
+            .score-bar__progress::before
+            {
+                font-family: 'Inter';
+                color: rgba(0, 0, 0, 0.5);
+                font-size: 14px;
+                content: "0";
+                left: 10px;
+                position: absolute;
+                bottom: -30px;
+            }
+            .score-bar__progress
+            {
+                border-radius: 30px 0 0 30px;
+            }   
+        }
+        &:last-child
+        {
+            .score-bar__progress
+            {
+                border-radius: 0 30px 30px 0;
+            } 
+            .stage__threshold-points
+            {
+                // position: absolute;
+                transform: translate(0,0);
+                right: 10px;
+            }
+            .stage__delimiter
+            {
+                background: none;
+            }
+        }
 
     }
     .score-bar__progress
     {
-        border-radius: 30px 0 0 30px;
         position: absolute;
         height: 40px;
-        max-width: 1440px;
-        width: 100px;
+        left: 0;
         transition: 500ms all ease-in-out;
         background: $div-starBlue;
     }
-    .score-bar__progress_rounded
+    .score-bar__progress_full
     {
-        border-radius: 30px;
+        width: 100%;
     }
 }
 </style>
